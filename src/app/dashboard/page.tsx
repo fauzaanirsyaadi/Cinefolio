@@ -8,7 +8,7 @@ import { PlusCircle, Edit, Trash2 } from 'lucide-react';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { useToast } from '@/hooks/use-toast';
 import type { Project } from '@/lib/types';
-import { supabase } from '@/lib/supabase/client';
+import { createClient } from '@/lib/supabase/client';
 
 // We need a slightly different type for the dashboard, as galleryImages and coverImage will be just URLs
 type DashboardProject = Omit<Project, 'coverImage' | 'galleryImages'> & {
@@ -21,6 +21,7 @@ export default function DashboardPage() {
   const [projects, setProjects] = useState<DashboardProject[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+  const supabase = createClient();
 
   useEffect(() => {
     fetchProjects();

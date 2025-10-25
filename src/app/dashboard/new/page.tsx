@@ -1,7 +1,7 @@
 'use client';
 
 import { ProjectForm } from '@/components/project-form';
-import { supabase } from '@/lib/supabase/client';
+import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
 import type { ProjectFormData } from '@/lib/types';
@@ -9,6 +9,7 @@ import type { ProjectFormData } from '@/lib/types';
 export default function NewProjectPage() {
   const router = useRouter();
   const { toast } = useToast();
+  const supabase = createClient();
 
   const handleSubmit = async (data: ProjectFormData) => {
     const { error } = await supabase.from('projects').insert([
@@ -19,7 +20,7 @@ export default function NewProjectPage() {
         shortDescription: data.shortDescription,
         description: data.description,
         coverImage: data.coverImageUrl,
-        galleryImages: data.galleryImageUrls.split('\\n').filter(url => url),
+        galleryImages: data.galleryImageUrls.split('\n').filter(url => url),
       },
     ]);
 

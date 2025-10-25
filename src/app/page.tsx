@@ -67,6 +67,12 @@ export default async function Home() {
     },
   ];
 
+  const projectsToDisplay = projectsData.map(p => ({
+    ...p,
+    coverImage: findImage(p.coverImage as string) || p.coverImage
+  }));
+
+
   return (
     <main className="container mx-auto px-4 py-24">
       <section className="animate-fade-in-up">
@@ -76,16 +82,17 @@ export default async function Home() {
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {projectsData.map((project) => (
+          {projectsToDisplay.map((project) => (
             <Link href={`/projects/${project.slug}`} key={project.id} className="group block">
               <Card className="bg-card border-none overflow-hidden transition-all duration-500 ease-in-out group-hover:shadow-2xl group-hover:shadow-primary/10 rounded-lg">
                 <CardContent className="p-0 relative">
                   <Image
                     src={(project.coverImage as any).url}
                     alt={project.title}
-                    width={600}
-                    height={400}
+                    width={(project.coverImage as any).width}
+                    height={(project.coverImage as any).height}
                     className="w-full h-auto object-cover aspect-[3/2] transition-transform duration-500 ease-in-out group-hover:scale-105"
+                    data-ai-hint={(project.coverImage as any).hint}
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
                   <div className="absolute bottom-0 left-0 p-6 md:p-8">

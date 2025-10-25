@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { ProjectForm } from '@/components/project-form';
-import { supabase } from '@/lib/supabase/client';
+import { createClient } from '@/lib/supabase/client';
 import { useParams, useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
 import type { Project, ProjectFormData } from '@/lib/types';
@@ -13,6 +13,7 @@ export default function EditProjectPage() {
   const { id } = params;
   const { toast } = useToast();
   const [project, setProject] = useState<ProjectFormData | null>(null);
+  const supabase = createClient();
 
   useEffect(() => {
     if (id) {
@@ -38,7 +39,7 @@ export default function EditProjectPage() {
         shortDescription: data.shortDescription,
         description: data.description,
         coverImageUrl: data.coverImage,
-        galleryImageUrls: (data.galleryImages || []).join('\\n'),
+        galleryImageUrls: (data.galleryImages || []).join('\n'),
       });
     }
   }
@@ -53,7 +54,7 @@ export default function EditProjectPage() {
         shortDescription: data.shortDescription,
         description: data.description,
         coverImage: data.coverImageUrl,
-        galleryImages: data.galleryImageUrls.split('\\n').filter(url => url),
+        galleryImages: data.galleryImageUrls.split('\n').filter(url => url),
       })
       .eq('id', id);
 
