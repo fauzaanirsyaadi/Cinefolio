@@ -45,19 +45,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export async function generateStaticParams() {
-    const supabase = createClient();
-    const { data: projects, error } = await supabase.from('projects').select('slug');
-
-    if (error || !projects) {
-        return [];
-    }
-
-    return projects.map((project) => ({
-        slug: project.slug,
-    }));
-}
-
 export default async function ProjectDetailsPage({ params }: { params: { slug: string } }) {
   const project = await getProject(params.slug);
 
