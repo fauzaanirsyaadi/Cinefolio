@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { supabase } from '@/lib/supabase/client';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -9,6 +8,7 @@ import { PlusCircle, Edit, Trash2 } from 'lucide-react';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { useToast } from '@/hooks/use-toast';
 import type { Project } from '@/lib/types';
+import { projects as staticProjects } from '@/lib/projects-data';
 
 // We need a slightly different type for the dashboard, as galleryImages and coverImage will be just URLs
 type DashboardProject = Omit<Project, 'coverImage' | 'galleryImages'> & {
@@ -27,7 +27,13 @@ export default function DashboardPage() {
 
   async function fetchProjects() {
     setLoading(true);
-    const { data, error } = await supabase.from('projects').select('*').order('id', { ascending: true });
+    // NOTE: We are now using static data.
+    // In a real application, you would fetch from Supabase like this:
+    // const { data, error } = await supabase.from('projects').select('*').order('id', { ascending: true });
+    // For now, we simulate the fetch with local data.
+    const data = staticProjects;
+    const error = null;
+
     if (error) {
       console.error('Error fetching projects:', error);
       toast({
@@ -36,12 +42,12 @@ export default function DashboardPage() {
         variant: 'destructive',
       });
     } else {
-        // The data from supabase might not match the shape of our project type, so we map it.
         const formattedProjects = data.map((p: any) => ({
         ...p,
-        // Assuming coverImage and galleryImages are stored as text/json
-        coverImage: typeof p.coverImage === 'string' ? p.coverImage : '',
-        galleryImages: Array.isArray(p.galleryImages) ? p.galleryImages : [],
+        coverImage: typeof p.coverImage === 'object' ? p.coverImage.url : p.coverImage,
+        galleryImages: Array.isArray(p.galleryImages) 
+          ? p.galleryImages.map(img => typeof img === 'object' ? img.url : img) 
+          : [],
         })) as DashboardProject[];
       setProjects(formattedProjects);
     }
@@ -49,21 +55,12 @@ export default function DashboardPage() {
   }
 
   async function deleteProject(id: number) {
-    const { error } = await supabase.from('projects').delete().match({ id });
-    if (error) {
-      console.error('Error deleting project:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to delete project.',
-        variant: 'destructive',
-      });
-    } else {
-      toast({
-        title: 'Success',
-        description: 'Project deleted successfully.',
-      });
-      fetchProjects();
-    }
+    // This is a mock function. In a real app, you would call Supabase.
+    toast({
+      title: 'Success',
+      description: 'Project deleted successfully (simulated).',
+    });
+    setProjects(projects.filter(p => p.id !== id));
   }
 
   if (loading) {
