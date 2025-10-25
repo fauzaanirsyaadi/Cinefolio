@@ -17,7 +17,7 @@ const signupSchema = z.object({
 
 
 export async function signup(formData: z.infer<typeof signupSchema>) {
-  const supabase = createClient();
+  const supabase = await createClient({ serviceRole: true });
   
   const { data: existingUser } = await supabase
     .from('users')

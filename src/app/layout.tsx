@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 import SiteHeader from '@/components/site-header';
 import SiteFooter from '@/components/site-footer';
-import { Toaster } from '@/components/ui/toaster';
+import ToasterClient from '@/components/ToasterClient'; // client component with 'use client'
 
 export const metadata: Metadata = {
   title: 'Cinefolio - A Creative Portfolio',
@@ -27,7 +27,7 @@ export default function RootLayout({
           <main className="flex-grow pt-16">{children}</main>
           <SiteFooter />
         </div>
-        <Toaster />
+        <ToasterClient />
       </body>
     </html>
   );

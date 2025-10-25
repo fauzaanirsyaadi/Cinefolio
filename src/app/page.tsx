@@ -1,108 +1,115 @@
+import { createClient } from '@/lib/supabase/server';
+import type { Project } from '@/lib/types';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Card, CardContent } from '@/components/ui/card';
-import type { Project } from '@/lib/types';
-import { findImage } from '@/lib/placeholder-images';
+import { Carousel, CarouselItem, CarouselPrevious, CarouselNext } from '@/components/ui/carousel';
 
 export const revalidate = 0; // Revalidate data on every request
 
 export default async function Home() {
-  // Dummy data to replace Supabase call
-  const projectsData: Project[] = [
-    {
-      id: 1,
-      slug: 'echoes-of-silence',
-      title: 'Echoes of Silence',
-      category: 'Architecture',
-      shortDescription: 'Exploring the interplay of light and shadow in brutalist structures.',
-      description: 'Echoes of Silence is a photographic series that delves into the stark beauty of brutalist architecture. The project captures the monumental scale and raw materiality of concrete structures, focusing on how light and shadow sculpt spaces and evoke a sense of quiet contemplation. Each photograph is a study in composition, texture, and the atmospheric quality of these architectural giants.',
-      coverImage: findImage('project-1-cover') as any,
-      galleryImages: [
-        findImage('project-1-gallery-1') as any,
-        findImage('project-1-gallery-2') as any,
-        findImage('project-1-gallery-3') as any,
-      ],
-    },
-    {
-      id: 2,
-      slug: 'neon-dreams',
-      title: 'Neon Dreams',
-      category: 'Street Photography',
-      shortDescription: 'A vibrant journey through the rain-soaked, neon-lit streets of Tokyo.',
-      description: 'Neon Dreams is a visual exploration of Tokyo at night. This series captures the city\'s electrifying energy, where rain-slicked streets reflect a kaleidoscope of neon signs. The photographs aim to convey the feeling of being immersed in a futuristic, almost surreal, urban landscape, highlighting moments of solitude and connection amidst the vibrant chaos.',
-      coverImage: findImage('project-2-cover') as any,
-      galleryImages: [
-        findImage('project-2-gallery-1') as any,
-        findImage('project-2-gallery-2') as any,
-        findImage('project-2-gallery-3') as any,
-      ],
-    },
-    {
-      id: 3,
-      slug: 'terra-incognita',
-      title: 'Terra Incognita',
-      category: 'Landscape',
-      shortDescription: 'An expedition to the otherworldly landscapes of Iceland.',
-      description: 'Terra Incognita is a landscape photography project that documents the alien-like beauty of Iceland. From vast volcanic deserts and shimmering glacial rivers to moss-covered lava fields, the series explores the raw, elemental forces that have shaped this unique island. The photographs seek to capture the sublime and often surreal nature of these remote and dramatic environments.',
-      coverImage: findImage('project-3-cover') as any,
-      galleryImages: [
-        findImage('project-3-gallery-1') as any,
-        findImage('project-3-gallery-2') as any,
-        findImage('project-3-gallery-3') as any,
-      ],
-    },
-    {
-      id: 4,
-      slug: 'portraits-of-resilience',
-      title: 'Portraits of Resilience',
-      category: 'Portraiture',
-      shortDescription: 'A black and white series capturing the strength and stories etched in time-worn faces.',
-      description: 'Portraits of Resilience is a collection of monochromatic portraits that celebrate the human spirit. The series focuses on capturing the character, wisdom, and stories reflected in the faces of the elderly. Through the use of dramatic lighting and intimate compositions, these photographs aim to reveal the depth of experience and enduring strength of each individual.',
-      coverImage: findImage('project-4-cover') as any,
-      galleryImages: [
-        findImage('project-4-gallery-1') as any,
-        findImage('project-4-gallery-2') as any,
-        findImage('project-4-gallery-3') as any,
-      ],
-    },
-  ];
+  // Server-side Supabase client (await the async helper)
+  const supabase = await createClient();
 
-  const projectsToDisplay = projectsData.map(p => ({
-    ...p,
-    coverImage: findImage(p.coverImage as string) || p.coverImage
-  }));
+  const { data, error } = await supabase
+    .from('projects')
+    .select('*')
+    .order('id', { ascending: true });
 
+  if (error) {
+    console.error('Error fetching projects:', error);
+    return (
+      <main className="container mx-auto px-4 py-24">
+        <p className="text-destructive">Failed to load projects.</p>
+      </main>
+    );
+  }
+
+  const projectsToDisplay = (data || []).map((p: any, idx: number) => {
+    const coverUrl =
+      typeof p.coverImage === 'string' ? p.coverImage : (p.coverImage && (p.coverImage.url || (p.coverImage as any).imageUrl)) || '';
+    return {
+      idx,
+      id: p.id,
+      slug: p.slug,
+      title: p.title,
+      category: p.category,
+      shortDescription: p.shortDescription,
+      description: p.description,
+      coverImage: coverUrl,
+      galleryImages: p.galleryImages || [],
+      createdAt: p.created_at,
+    };
+  }) as Array<{
+    idx: number;
+    id: number;
+    slug: string;
+    title: string;
+    category: string;
+    shortDescription: string;
+    description: string;
+    coverImage: string;
+    galleryImages: string[];
+    createdAt: string | null;
+  }>;
+
+  if (projectsToDisplay.length === 0) {
+    return (
+      <main className="container mx-auto px-4 py-24">
+        <p className="text-muted-foreground">No projects found.</p>
+      </main>
+    );
+  }
 
   return (
     <main className="container mx-auto px-4 py-24">
       <section className="animate-fade-in-up">
-        <h1 className="text-3xl font-bold tracking-tight text-center mb-4 sm:text-4xl md:text-5xl font-headline">Creative Projects</h1>
-        <p className="text-muted-foreground text-center max-w-2xl mx-auto mb-12">
-          A curated selection of my work across various disciplines. Each project is a journey into form, light, and narrative.
-        </p>
+        <div className="flex items-center justify-between mb-8">
+          <h1 className="text-3xl font-bold tracking-tight font-headline">Work</h1>
+          <Link href="/dashboard" className="text-sm text-primary underline">
+            Manage
+          </Link>
+        </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {projectsToDisplay.map((project) => (
-            <Link href={`/projects/${project.slug}`} key={project.id} className="group block">
-              <Card className="bg-card border-none overflow-hidden transition-all duration-500 ease-in-out group-hover:shadow-2xl group-hover:shadow-primary/10 rounded-lg">
-                <CardContent className="p-0 relative">
-                  <Image
-                    src={(project.coverImage as any).url}
-                    alt={project.title}
-                    width={(project.coverImage as any).width}
-                    height={(project.coverImage as any).height}
-                    className="w-full h-auto object-cover aspect-[3/2] transition-transform duration-500 ease-in-out group-hover:scale-105"
-                    data-ai-hint={(project.coverImage as any).hint}
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
-                  <div className="absolute bottom-0 left-0 p-6 md:p-8">
-                    <p className="text-sm text-accent/90 mb-1">{project.category}</p>
-                    <h2 className="text-2xl font-bold text-white font-headline">{project.title}</h2>
+        <div className="relative">
+          <Carousel className="min-h-[320px]">
+            {projectsToDisplay.map((p) => (
+              <CarouselItem key={p.id} className="p-4">
+                <Card className="max-w-3xl mx-auto">
+                  <div className="relative w-full aspect-[16/9] rounded-t-md overflow-hidden bg-muted">
+                    {p.coverImage ? (
+                      <Image
+                        src={p.coverImage}
+                        alt={p.title}
+                        fill
+                        className="object-cover"
+                        sizes="(max-width: 768px) 100vw, 800px"
+                      />
+                    ) : null}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                    <div className="absolute left-6 bottom-6 text-white">
+                      <span className="inline-block bg-black/50 px-2 py-1 rounded text-xs uppercase tracking-wider">{p.category}</span>
+                      <h2 className="mt-2 text-2xl font-extrabold">{p.title}</h2>
+                    </div>
                   </div>
-                </CardContent>
-              </Card>
-            </Link>
-          ))}
+
+                  <CardContent className="p-6">
+                    <p className="text-muted-foreground mb-4 line-clamp-3">{p.shortDescription}</p>
+                    <div className="flex items-center justify-between">
+                      <Link href={`/projects/${p.slug}`} className="text-sm text-primary underline">
+                        View Project
+                      </Link>
+                      <span className="text-xs text-muted-foreground">{p.createdAt ? new Date(p.createdAt).toLocaleDateString() : ''}</span>
+                    </div>
+                  </CardContent>
+                </Card>
+              </CarouselItem>
+            ))}
+
+            {/* Previous / Next must be rendered inside the Carousel so useCarousel() has context */}
+            <CarouselPrevious className="absolute left-2 top-1/2 -translate-y-1/2 z-10" />
+            <CarouselNext className="absolute right-2 top-1/2 -translate-y-1/2 z-10" />
+          </Carousel>
         </div>
       </section>
     </main>

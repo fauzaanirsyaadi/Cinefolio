@@ -15,7 +15,8 @@ type Props = {
 export const revalidate = 0; // Revalidate data on every request
 
 async function getProject(slug: string): Promise<Project | null> {
-    const supabase = createClient();
+    // createClient is async — await it so `supabase.from` is available
+    const supabase = await createClient();
     const { data, error } = await supabase
         .from('projects')
         .select('*')
@@ -31,7 +32,9 @@ async function getProject(slug: string): Promise<Project | null> {
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const project = await getProject(params.slug);
+  // `params` can be a proxy/promise in Next.js — await before using properties
+  const { slug } = (await params) as { slug: string };
+  const project = await getProject(slug);
 
   if (!project) {
     return {
@@ -46,7 +49,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function ProjectDetailsPage({ params }: { params: { slug: string } }) {
-  const project = await getProject(params.slug);
+  // ensure params is awaited before accessing slug
+  const { slug } = (await params) as { slug: string };
+  const project = await getProject(slug);
 
   if (!project) {
     notFound();

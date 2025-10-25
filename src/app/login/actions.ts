@@ -6,7 +6,7 @@ import { createClient } from '@/lib/supabase/server';
 import bcrypt from 'bcryptjs';
 
 export async function login(formData: FormData | any) {
-  const supabase = createClient();
+  const supabase = await createClient();
   const email = formData.email;
   const password = formData.password;
 

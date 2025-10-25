@@ -16,7 +16,8 @@ export const sessionOptions = {
 };
 
 export async function getSession() {
-  const session = await getIronSession<SessionData>(cookies(), sessionOptions);
+  const cookieStore = await cookies();
+  const session = await getIronSession<SessionData>(cookieStore, sessionOptions);
   return session;
 }
 
@@ -42,4 +43,20 @@ export async function getUser() {
   return {
     email: session.email,
   };
+}
+
+async function getProject(slug: string): Promise<Project | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+      .from('projects')
+      .select('*')
+      .eq('slug', slug)
+      .single();
+  
+  if (error) {
+      console.error('Error fetching project by slug:', error);
+      return null;
+  }
+  
+  return data as Project;
 }
