@@ -1,7 +1,7 @@
 
 'use client';
 
-import { Suspense, useState } from 'react';
+import { Suspense, useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -11,7 +11,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { verifyOtp } from './actions';
+import { verifyOtp, resendOtp } from './actions';
 
 const formSchema = z.object({
   otp: z.string().min(6, { message: 'Your OTP must be 6 characters.' }).max(6),
@@ -23,6 +23,16 @@ function VerifyOtpComponent() {
   const searchParams = useSearchParams();
   const email = searchParams.get('email');
   const [error, setError] = useState<string | null>(null);
+  const [isResending, setIsResending] = useState(false);
+  const [cooldown, setCooldown] = useState(0);
+
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (cooldown > 0) {
+      timer = setTimeout(() => setCooldown(cooldown - 1), 1000);
+    }
+    return () => clearTimeout(timer);
+  }, [cooldown]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -53,6 +63,29 @@ function VerifyOtpComponent() {
       });
     }
   }
+
+  async function handleResendOtp() {
+    if (!email || cooldown > 0) return;
+
+    setIsResending(true);
+    const result = await resendOtp({ email });
+    setIsResending(false);
+
+    if (result.success) {
+      toast({
+        title: 'OTP Resent',
+        description: 'A new OTP has been generated. Check the server console.',
+      });
+      setCooldown(60); // Start 60-second cooldown
+    } else {
+      toast({
+        title: 'Resend Failed',
+        description: result.error || 'Could not resend OTP.',
+        variant: 'destructive',
+      });
+    }
+  }
+
 
   return (
      <main className="container mx-auto px-4 py-32 animate-fade-in-up">
@@ -91,6 +124,21 @@ function VerifyOtpComponent() {
                 </Button>
               </form>
             </Form>
+            <div className="mt-4 text-center text-sm">
+                Didn't receive a code?{' '}
+                <Button
+                  variant="link"
+                  className="p-0 h-auto"
+                  onClick={handleResendOtp}
+                  disabled={isResending || cooldown > 0}
+                >
+                  {isResending
+                    ? 'Sending...'
+                    : cooldown > 0
+                    ? `Resend in ${cooldown}s`
+                    : 'Resend OTP'}
+                </Button>
+              </div>
           </CardContent>
         </Card>
       </div>
