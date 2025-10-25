@@ -51,7 +51,7 @@ export default function RegisterPage() {
         title: 'Registration Successful',
         description: 'An OTP has been sent to your email. Please verify.',
       });
-      router.push('/verify-otp');
+      router.push(`/verify-otp?email=${encodeURIComponent(values.email)}`);
     } else {
       setError(result.error || 'An error occurred.');
       toast({

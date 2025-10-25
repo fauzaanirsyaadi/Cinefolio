@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState } from 'react';
+import { Suspense, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -10,16 +10,18 @@ import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { verifyOtp } from './actions';
 
 const formSchema = z.object({
   otp: z.string().min(6, { message: 'Your OTP must be 6 characters.' }).max(6),
 });
 
-export default function VerifyOtpPage() {
+function VerifyOtpComponent() {
   const { toast } = useToast();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const email = searchParams.get('email');
   const [error, setError] = useState<string | null>(null);
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -30,8 +32,12 @@ export default function VerifyOtpPage() {
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
+    if (!email) {
+        setError('Email not found. Please try registering again.');
+        return;
+    }
     setError(null);
-    const result = await verifyOtp(values);
+    const result = await verifyOtp({ otp: values.otp, email });
     if (result.success) {
       toast({
         title: 'Account Verified',
@@ -49,13 +55,13 @@ export default function VerifyOtpPage() {
   }
 
   return (
-    <main className="container mx-auto px-4 py-32 animate-fade-in-up">
+     <main className="container mx-auto px-4 py-32 animate-fade-in-up">
       <div className="max-w-md mx-auto">
         <Card>
           <CardHeader className="text-center">
             <CardTitle className="text-2xl font-bold tracking-tight font-headline">Verify Your Account</CardTitle>
             <CardDescription>
-              Enter the 6-digit code sent to your email.
+              Enter the 6-digit code sent to <span className="font-medium text-foreground">{email}</span>.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -89,5 +95,13 @@ export default function VerifyOtpPage() {
         </Card>
       </div>
     </main>
-  );
+  )
+}
+
+export default function VerifyOtpPage() {
+    return (
+        <Suspense fallback={<div>Loading...</div>}>
+            <VerifyOtpComponent />
+        </Suspense>
+    )
 }

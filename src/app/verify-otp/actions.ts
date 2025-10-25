@@ -2,32 +2,21 @@
 
 import * as z from 'zod';
 import { createClient } from '@/lib/supabase/server';
-import { getIronSession } from 'iron-session';
-import { cookies } from 'next/headers';
-import { sessionOptions } from '@/lib/auth';
 
 const verifyOtpSchema = z.object({
   otp: z.string().min(6),
-  email: z.string().email().optional(), // Make email optional here, get it from session
+  email: z.string().email(),
 });
 
 export async function verifyOtp(formData: z.infer<typeof verifyOtpSchema>) {
   const supabase = createClient();
-  const session = await getIronSession(cookies(), sessionOptions);
-  
-  // We need to know which user's OTP to verify. 
-  // A real app would get this from a secure session or a token.
-  // For this example, we'll have to find the user by the OTP itself, which is not secure.
-  // A better approach would be to pass the email from the registration step.
-  // But for this simple case, we find the most recent inactive user with this OTP.
   
   const { data: user, error: findError } = await supabase
     .from('users')
     .select('*')
+    .eq('email', formData.email)
     .eq('otp', formData.otp)
     .eq('is_active', false)
-    .order('created_at', { ascending: false })
-    .limit(1)
     .single();
 
   if (findError || !user) {
