@@ -1,6 +1,6 @@
 import { type NextRequest } from 'next/server'
 import { updateSession } from '@/lib/supabase/middleware'
-import { createClient } from './lib/supabase/server';
+import { createClient } from '@/lib/supabase/server';
 
 export async function middleware(request: NextRequest) {
   const supabase = createClient();
