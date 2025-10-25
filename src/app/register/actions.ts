@@ -1,6 +1,7 @@
 'use server';
 
 import * as z from 'zod';
+import { createClient } from '@/lib/supabase/server';
 
 const signupSchema = z.object({
   name: z.string().min(2),
@@ -14,16 +15,43 @@ const signupSchema = z.object({
 
 
 export async function signup(formData: z.infer<typeof signupSchema>) {
-  // This is a dummy action for portfolio purposes.
-  // In a real application, you would:
-  // 1. Validate the input.
-  // 2. Check if a user with this email already exists.
-  // 3. Hash the password.
-  // 4. Create a new user in your database.
-  // 5. Generate a verification token/link and send it via email.
+  const supabase = createClient();
   
-  console.log('New user signup:', { name: formData.name, email: formData.email });
+  // Check if user already exists
+  const { data: existingUser, error: selectError } = await supabase
+    .from('users')
+    .select('email')
+    .eq('email', formData.email)
+    .single();
 
-  // Simulate a successful signup
+  if (existingUser) {
+    return { success: false, error: 'User with this email already exists.' };
+  }
+
+  // For portfolio purposes, we're not hashing the password.
+  // In a real application, ALWAYS hash passwords before storing them.
+  // We'll also generate a dummy OTP.
+  const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+  const { data, error } = await supabase
+    .from('users')
+    .insert([
+      { 
+        name: formData.name, 
+        email: formData.email,
+        password: formData.password, // WARNING: Storing plain text password
+        is_active: false,
+        otp: otp,
+      }
+    ]);
+
+  if (error) {
+    console.error('Error inserting user:', error);
+    return { success: false, error: 'Could not create user.' };
+  }
+
+  console.log('New user signup:', { name: formData.name, email: formData.email });
+  console.log(`Generated OTP for ${formData.email}: ${otp}`); // Simulate sending OTP
+
   return { success: true };
 }
