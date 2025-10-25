@@ -74,7 +74,7 @@ function VerifyOtpComponent() {
     if (result.success) {
       toast({
         title: 'OTP Resent',
-        description: 'A new OTP has been generated. Check the server console.',
+        description: 'A new OTP has been sent to your email.',
       });
       setCooldown(60); // Start 60-second cooldown
     } else {

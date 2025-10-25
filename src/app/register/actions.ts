@@ -3,6 +3,7 @@
 import * as z from 'zod';
 import { createClient } from '@/lib/supabase/server';
 import bcrypt from 'bcryptjs';
+import { sendVerificationEmail } from '@/lib/email';
 
 const signupSchema = z.object({
   name: z.string().min(2),
@@ -47,13 +48,14 @@ export async function signup(formData: z.infer<typeof signupSchema>) {
     console.error('Error inserting user:', error);
     return { success: false, error: 'Could not create user.' };
   }
-
-  console.log(`
-  ================================================
-  OTP for ${formData.email}: ${otp}
-  (This is for development only. Not an actual email.)
-  ================================================
-  `);
-
-  return { success: true };
+  
+  try {
+    await sendVerificationEmail(formData.email, otp, formData.name);
+    return { success: true };
+  } catch (emailError) {
+    console.error("Email sending error:", emailError);
+    // Even if email fails, registration is technically successful.
+    // You might want to handle this case differently, e.g., by telling the user to try "Resend OTP".
+    return { success: true, warning: 'User created, but failed to send verification email.' };
+  }
 }

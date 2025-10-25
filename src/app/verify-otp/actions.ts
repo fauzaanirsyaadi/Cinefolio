@@ -3,6 +3,7 @@
 
 import * as z from 'zod';
 import { createClient } from '@/lib/supabase/server';
+import { sendVerificationEmail } from '@/lib/email';
 
 const verifyOtpSchema = z.object({
   otp: z.string().min(6),
@@ -50,7 +51,7 @@ export async function resendOtp(formData: z.infer<typeof resendOtpSchema>) {
 
   const { data: user, error: findError } = await supabase
     .from('users')
-    .select('id, is_active')
+    .select('id, name, is_active')
     .eq('email', email)
     .single();
 
@@ -75,12 +76,11 @@ export async function resendOtp(formData: z.infer<typeof resendOtpSchema>) {
     return { success: false, error: 'Could not generate a new OTP.' };
   }
 
-  console.log(`
-  ================================================
-  New OTP for ${email}: ${newOtp}
-  (This is for development only. Not an actual email.)
-  ================================================
-  `);
-
-  return { success: true };
+  try {
+    await sendVerificationEmail(email, newOtp, user.name);
+    return { success: true };
+  } catch (emailError) {
+    console.error("Email sending error:", emailError);
+    return { success: false, error: 'Failed to send new OTP email.' };
+  }
 }

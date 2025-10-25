@@ -49,7 +49,7 @@ export default function RegisterPage() {
     if (result.success) {
       toast({
         title: 'Registration Submitted',
-        description: 'Check the server console for your OTP to verify your account.',
+        description: 'A verification code has been sent to your email.',
       });
       router.push(`/verify-otp?email=${encodeURIComponent(values.email)}`);
     } else {
