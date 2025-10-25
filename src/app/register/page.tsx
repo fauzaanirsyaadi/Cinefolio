@@ -48,8 +48,8 @@ export default function RegisterPage() {
     const result = await signup(values);
     if (result.success) {
       toast({
-        title: 'Registration Successful',
-        description: 'An OTP has been sent to your email. Please verify.',
+        title: 'Registration Submitted',
+        description: 'Check the server console for your OTP to verify your account.',
       });
       router.push(`/verify-otp?email=${encodeURIComponent(values.email)}`);
     } else {

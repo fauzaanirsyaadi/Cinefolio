@@ -2,6 +2,7 @@
 
 import * as z from 'zod';
 import { createClient } from '@/lib/supabase/server';
+import bcrypt from 'bcryptjs';
 
 const signupSchema = z.object({
   name: z.string().min(2),
@@ -17,8 +18,7 @@ const signupSchema = z.object({
 export async function signup(formData: z.infer<typeof signupSchema>) {
   const supabase = createClient();
   
-  // Check if user already exists
-  const { data: existingUser, error: selectError } = await supabase
+  const { data: existingUser } = await supabase
     .from('users')
     .select('email')
     .eq('email', formData.email)
@@ -28,18 +28,16 @@ export async function signup(formData: z.infer<typeof signupSchema>) {
     return { success: false, error: 'User with this email already exists.' };
   }
 
-  // For portfolio purposes, we're not hashing the password.
-  // In a real application, ALWAYS hash passwords before storing them.
-  // We'll also generate a dummy OTP.
+  const hashedPassword = await bcrypt.hash(formData.password, 10);
   const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
-  const { data, error } = await supabase
+  const { error } = await supabase
     .from('users')
     .insert([
       { 
         name: formData.name, 
         email: formData.email,
-        password: formData.password, // WARNING: Storing plain text password
+        password: hashedPassword,
         is_active: false,
         otp: otp,
       }
@@ -50,8 +48,12 @@ export async function signup(formData: z.infer<typeof signupSchema>) {
     return { success: false, error: 'Could not create user.' };
   }
 
-  console.log('New user signup:', { name: formData.name, email: formData.email });
-  console.log(`Generated OTP for ${formData.email}: ${otp}`); // Simulate sending OTP
+  console.log(`
+  ================================================
+  OTP for ${formData.email}: ${otp}
+  (This is for development only. Not an actual email.)
+  ================================================
+  `);
 
   return { success: true };
 }
