@@ -6,7 +6,12 @@ const signupSchema = z.object({
   name: z.string().min(2),
   email: z.string().email(),
   password: z.string().min(8),
+  confirmPassword: z.string(),
+}).refine(data => data.password === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ['confirmPassword'],
 });
+
 
 export async function signup(formData: z.infer<typeof signupSchema>) {
   // This is a dummy action for portfolio purposes.
@@ -17,7 +22,7 @@ export async function signup(formData: z.infer<typeof signupSchema>) {
   // 4. Create a new user in your database.
   // 5. Generate a verification token/link and send it via email.
   
-  console.log('New user signup:', formData);
+  console.log('New user signup:', { name: formData.name, email: formData.email });
 
   // Simulate a successful signup
   return { success: true };

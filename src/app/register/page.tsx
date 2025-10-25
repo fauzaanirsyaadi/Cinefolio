@@ -12,17 +12,26 @@ import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { signup } from './actions';
+import { Eye, EyeOff } from 'lucide-react';
 
-const formSchema = z.object({
-  name: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
-  email: z.string().email({ message: 'Please enter a valid email.' }),
-  password: z.string().min(8, { message: 'Password must be at least 8 characters.' }),
-});
+const formSchema = z
+  .object({
+    name: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
+    email: z.string().email({ message: 'Please enter a valid email.' }),
+    password: z.string().min(8, { message: 'Password must be at least 8 characters.' }),
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ['confirmPassword'],
+  });
 
 export default function RegisterPage() {
   const { toast } = useToast();
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -30,6 +39,7 @@ export default function RegisterPage() {
       name: '',
       email: '',
       password: '',
+      confirmPassword: '',
     },
   });
 
@@ -98,7 +108,42 @@ export default function RegisterPage() {
                     <FormItem>
                       <FormLabel>Password</FormLabel>
                       <FormControl>
-                        <Input type="password" placeholder="••••••••" {...field} className="bg-background text-base" />
+                        <div className="relative">
+                          <Input type={showPassword ? 'text' : 'password'} placeholder="••••••••" {...field} className="bg-background text-base pr-10" />
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            className="absolute inset-y-0 right-0 h-full px-3"
+                            onClick={() => setShowPassword(!showPassword)}
+                          >
+                            {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                          </Button>
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="confirmPassword"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Re-type Password</FormLabel>
+                      <FormControl>
+                        <div className="relative">
+                          <Input type={showConfirmPassword ? 'text' : 'password'} placeholder="••••••••" {...field} className="bg-background text-base pr-10" />
+                           <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            className="absolute inset-y-0 right-0 h-full px-3"
+                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                          >
+                            {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                          </Button>
+                        </div>
                       </FormControl>
                       <FormMessage />
                     </FormItem>
