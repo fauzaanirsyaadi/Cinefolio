@@ -1,3 +1,106 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "project-1-cover",
+      "description": "Cover image for Echoes of Silence",
+      "imageUrl": "https://images.unsplash.com/photo-1493397212122-2b85dda8106b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxhYnN0cmFjdCUyMGFyY2hpdGVjdHVyZXxlbnwwfHx8fDE3NjEzODQxNTJ8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "abstract architecture"
+    },
+    {
+      "id": "project-1-gallery-1",
+      "description": "Gallery image 1 for Echoes of Silence",
+      "imageUrl": "https://images.unsplash.com/photo-1704839562146-3e4c2c1ef84a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxicnV0YWxpc3QlMjBjb25jcmV0ZXxlbnwwfHx8fDE3NjEzODQxNTN8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "brutalist concrete"
+    },
+    {
+      "id": "project-1-gallery-2",
+      "description": "Gallery image 2 for Echoes of Silence",
+      "imageUrl": "https://images.unsplash.com/photo-1583329550487-0fa300a4cd1a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxsaWdodCUyMHNoYWRvd3xlbnwwfHx8fDE3NjEzODQxNTJ8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "light shadow"
+    },
+    {
+      "id": "project-1-gallery-3",
+      "description": "Gallery image 3 for Echoes of Silence",
+      "imageUrl": "https://images.unsplash.com/photo-1719264890811-d6ce5e891bd6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxnZW9tZXRyaWMlMjBsaW5lc3xlbnwwfHx8fDE3NjEzODQxNTJ8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "geometric lines"
+    },
+    {
+      "id": "project-2-cover",
+      "description": "Cover image for Neon Dreams",
+      "imageUrl": "https://images.unsplash.com/photo-1559245718-212fba2d22e2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHx0b2t5byUyMG5lb258ZW58MHx8fHwxNzYxMzg0MTUyfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "tokyo neon"
+    },
+    {
+      "id": "project-2-gallery-1",
+      "description": "Gallery image 1 for Neon Dreams",
+      "imageUrl": "https://images.unsplash.com/photo-1727520018050-c0c351d9431d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxuaWdodCUyMGFsbGV5fGVufDB8fHx8MTc2MTM4NDE1Mnww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "night alley"
+    },
+    {
+      "id": "project-2-gallery-2",
+      "description": "Gallery image 2 for Neon Dreams",
+      "imageUrl": "https://images.unsplash.com/photo-1529234774845-b90fd07f1d23?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxjaXR5JTIwbGlnaHRzfGVufDB8fHx8MTc2MTI5NTAyOXww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "city lights"
+    },
+    {
+      "id": "project-2-gallery-3",
+      "description": "Gallery image 3 for Neon Dreams",
+      "imageUrl": "https://images.unsplash.com/photo-1612156321244-93920cba0bad?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxzdHJlZXQlMjByZWZsZWN0aW9ufGVufDB8fHx8MTc2MTM4NDE1M3ww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "street reflection"
+    },
+    {
+      "id": "project-3-cover",
+      "description": "Cover image for Terra Incognita",
+      "imageUrl": "https://images.unsplash.com/photo-1500043357865-c6b8827edf10?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxpY2VsYW5kJTIwbGFuZHNjYXBlfGVufDB8fHx8MTc2MTM4NDE1Mnww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "iceland landscape"
+    },
+    {
+      "id": "project-3-gallery-1",
+      "description": "Gallery image 1 for Terra Incognita",
+      "imageUrl": "https://images.unsplash.com/photo-1603731896431-2b3439e9f092?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHx2b2xjYW5pYyUyMGRlc2VydHxlbnwwfHx8fDE3NjEzODQxNTJ8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "volcanic desert"
+    },
+    {
+      "id": "project-3-gallery-2",
+      "description": "Gallery image 2 for Terra Incognita",
+      "imageUrl": "https://images.unsplash.com/photo-1633889506840-c1c1e5e57624?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxnbGFjaWFsJTIwcml2ZXJ8ZW58MHx8fHwxNzYxMzg0MTUyfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "glacial river"
+    },
+    {
+      "id": "project-3-gallery-3",
+      "description": "Gallery image 3 for Terra Incognita",
+      "imageUrl": "https://images.unsplash.com/photo-1730012066338-d544cf255500?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxtb3NzeSUyMGxhdmF8ZW58MHx8fHwxNzYxMzg0MTUyfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "mossy lava"
+    },
+    {
+      "id": "project-4-cover",
+      "description": "Cover image for Portraits of Resilience",
+      "imageUrl": "https://images.unsplash.com/photo-1741035726677-3a26a73f49aa?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxwb3J0cmFpdCUyMG1vbm9jaHJvbWV8ZW58MHx8fHwxNzYxMzg0MTUzfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "portrait monochrome"
+    },
+    {
+      "id": "project-4-gallery-1",
+      "description": "Gallery image 1 for Portraits of Resilience",
+      "imageUrl": "https://images.unsplash.com/photo-1648899054961-d33d425a4ced?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxlbGRlcmx5JTIwZmFjZXxlbnwwfHx8fDE3NjEzODQxNTJ8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "elderly face"
+    },
+    {
+      "id": "project-4-gallery-2",
+      "description": "Gallery image 2 for Portraits of Resilience",
+      "imageUrl": "https://images.unsplash.com/photo-1662244073774-da9ea2735bf8?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxleHByZXNzaXZlJTIwZXllc3xlbnwwfHx8fDE3NjEzODQxNTJ8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "expressive eyes"
+    },
+    {
+      "id": "project-4-gallery-3",
+      "description": "Gallery image 3 for Portraits of Resilience",
+      "imageUrl": "https://images.unsplash.com/photo-1608135378137-3e07668719c6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHx3cmlua2xlZCUyMGhhbmRzfGVufDB8fHx8MTc2MTM4NDE1Mnww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "wrinkled hands"
+    },
+    {
+      "id": "about-page-image",
+      "description": "Image for the about page",
+      "imageUrl": "https://images.unsplash.com/photo-1447758902204-48010b87c24d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxhcnRpc3QlMjBzdHVkaW98ZW58MHx8fHwxNzYxMzA1NDM1fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "artist studio"
+    }
+  ]
 }
