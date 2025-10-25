@@ -2,17 +2,19 @@
 
 import { Resend } from 'resend';
 import { OtpEmailTemplate } from '@/components/email/otp-template';
-
-const resend = new Resend(process.env.RESEND_API_KEY);
+import * as React from 'react';
 
 export async function sendVerificationEmail(email: string, otp: string, name: string) {
   if (!process.env.RESEND_API_KEY) {
-    throw new Error('Resend API Key is not set.');
+    console.error('Resend API Key is not set in environment variables.');
+    throw new Error('Resend API Key is not configured.');
   }
+
+  const resend = new Resend(process.env.RESEND_API_KEY);
 
   try {
     const { data, error } = await resend.emails.send({
-      from: 'Cinefolio <onboarding@resend.dev>', // Change this to your verified sender domain
+      from: 'Cinefolio <onboarding@resend.dev>', // Ubah ini ke domain pengirim terverifikasi Anda
       to: [email],
       subject: 'Your Cinefolio Verification Code',
       react: OtpEmailTemplate({ name, otp }) as React.ReactElement,
@@ -25,7 +27,8 @@ export async function sendVerificationEmail(email: string, otp: string, name: st
 
     return data;
   } catch (error) {
-    console.error(error);
-    throw error;
+    console.error('Error sending verification email:', error);
+    // Jangan ekspos detail error internal ke klien
+    throw new Error('Could not send verification email.');
   }
 }
