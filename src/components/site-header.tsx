@@ -1,16 +1,16 @@
 import Link from 'next/link';
 import { Button } from './ui/button';
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from './ui/sheet';
-import { Menu, X, Instagram, Facebook, Linkedin, LogOut } from 'lucide-react';
+import { Menu, X, Instagram, Facebook, Linkedin, LogOut, LogIn } from 'lucide-react';
 import { Separator } from './ui/separator';
-import { createClient } from '@/lib/supabase/server';
-import { redirect } from 'next/navigation';
+import { getUser } from '@/lib/auth';
+import { logout } from '@/app/login/actions';
+
 
 const navLinks = [
   { href: '/', label: 'Work' },
   { href: '/about', label: 'About' },
   { href: '/contact', label: 'Contact' },
-  { href: '/dashboard', label: 'Dashboard' },
 ];
 
 const secondaryLinks = [
@@ -20,16 +20,10 @@ const secondaryLinks = [
 ]
 
 const SiteHeader = async () => {
+  const user = await getUser();
 
-  const supabase = createClient();
-  const { data } = await supabase.auth.getUser();
-
-  const signOut = async () => {
-    "use server";
-    const supabase = createClient();
-    await supabase.auth.signOut();
-    return redirect("/login");
-  };
+  const dashboardLink = user ? { href: '/dashboard', label: 'Dashboard' } : null;
+  const allNavLinks = dashboardLink ? [...navLinks, dashboardLink] : navLinks;
 
 
   return (
@@ -41,13 +35,13 @@ const SiteHeader = async () => {
             <span className="sr-only">Cinefolio</span>
           </Link>
           <nav className="hidden md:flex items-center space-x-6 text-sm font-medium">
-            {navLinks.map((link, index) => (
+            {allNavLinks.map((link, index) => (
               <Link key={link.href} href={link.href} className="text-foreground/80 hover:text-primary transition-colors font-headline tracking-widest text-xs">
                 {`0${index + 1}`}<span className="ml-2">{link.label.toUpperCase()}</span>
               </Link>
             ))}
-             {data.user ? (
-              <form action={signOut}>
+             {user ? (
+              <form action={logout}>
                 <Button variant="ghost" size="sm" className="text-foreground/80 hover:text-primary transition-colors font-headline tracking-widest text-xs">
                   <LogOut className="mr-2 h-4 w-4" />
                   Sign Out
@@ -55,6 +49,7 @@ const SiteHeader = async () => {
               </form>
             ) : (
               <Link href="/login" className="text-foreground/80 hover:text-primary transition-colors font-headline tracking-widest text-xs">
+                 <LogIn className="mr-2 h-4 w-4" />
                 Login
               </Link>
             )}
@@ -78,7 +73,7 @@ const SiteHeader = async () => {
                         </SheetClose>
                     </div>
                     <nav className="flex flex-col space-y-2 p-6 flex-grow">
-                        {navLinks.map((link, index) => (
+                        {allNavLinks.map((link, index) => (
                           <SheetClose asChild key={link.href}>
                             <Link href={link.href} className="flex items-baseline gap-4 text-3xl font-bold font-headline group">
                                 <span className="text-xs font-light text-primary-foreground/50 group-hover:text-primary-foreground transition-colors">0{index+1}</span>
@@ -86,11 +81,11 @@ const SiteHeader = async () => {
                             </Link>
                           </SheetClose>
                         ))}
-                         {data.user ? (
+                         {user ? (
                             <SheetClose asChild>
-                               <form action={signOut} className="w-full">
+                               <form action={logout} className="w-full">
                                 <Button variant="ghost" className="flex items-baseline gap-4 text-3xl font-bold font-headline group w-full justify-start p-0">
-                                    <span className="text-xs font-light text-primary-foreground/50 group-hover:text-primary-foreground transition-colors">05</span>
+                                    <span className="text-xs font-light text-primary-foreground/50 group-hover:text-primary-foreground transition-colors">0{allNavLinks.length + 1}</span>
                                     <span className="group-hover:translate-x-2 transition-transform">SIGN OUT</span>
                                 </Button>
                                </form>
@@ -98,7 +93,7 @@ const SiteHeader = async () => {
                         ) : (
                            <SheetClose asChild>
                              <Link href="/login" className="flex items-baseline gap-4 text-3xl font-bold font-headline group">
-                                <span className="text-xs font-light text-primary-foreground/50 group-hover:text-primary-foreground transition-colors">05</span>
+                                <span className="text-xs font-light text-primary-foreground/50 group-hover:text-primary-foreground transition-colors">0{allNavLinks.length + 1}</span>
                                 <span className="group-hover:translate-x-2 transition-transform">LOGIN</span>
                             </Link>
                            </SheetClose>
@@ -126,7 +121,7 @@ const SiteHeader = async () => {
                             </Link>
                         </div>
                         <Separator className="bg-primary-foreground/20" style={{borderStyle: 'dashed'}}/>
-                         <p className="text-center text-xs text-primary-foreground/50">&copy; {new Date().getFullYear()} Siena Film Foundation.</p>
+                         <p className="text-center text-xs text-primary-foreground/50">&copy; {new Date().getFullYear()} Cinefolio.</p>
                      </div>
                  </div>
               </SheetContent>
