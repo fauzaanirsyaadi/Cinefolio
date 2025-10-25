@@ -1,9 +1,29 @@
-import { projects } from '@/lib/projects-data';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Card, CardContent } from '@/components/ui/card';
+import { createClient } from '@/lib/supabase/server';
+import type { Project } from '@/lib/types';
 
-export default function Home() {
+export const revalidate = 0; // Revalidate data on every request
+
+export default async function Home() {
+  const supabase = createClient();
+  const { data: projects, error } = await supabase
+    .from('projects')
+    .select('*')
+    .order('id', { ascending: true });
+
+  if (error) {
+    console.error('Error fetching projects:', error);
+    // You can render an error state here if you want
+  }
+
+  const projectsData = (projects as any[] || []).map(p => ({
+      ...p,
+      coverImage: p.coverImage,
+      galleryImages: p.galleryImages || [],
+  })) as Project[];
+
   return (
     <main className="container mx-auto px-4 py-24">
       <section className="animate-fade-in-up">
@@ -13,17 +33,16 @@ export default function Home() {
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {projects.map((project) => (
+          {projectsData.map((project) => (
             <Link href={`/projects/${project.slug}`} key={project.id} className="group block">
               <Card className="bg-card border-none overflow-hidden transition-all duration-500 ease-in-out group-hover:shadow-2xl group-hover:shadow-primary/10 rounded-lg">
                 <CardContent className="p-0 relative">
                   <Image
-                    src={project.coverImage.url}
+                    src={project.coverImage as string}
                     alt={project.title}
-                    width={project.coverImage.width}
-                    height={project.coverImage.height}
+                    width={600}
+                    height={400}
                     className="w-full h-auto object-cover aspect-[3/2] transition-transform duration-500 ease-in-out group-hover:scale-105"
-                    data-ai-hint={project.coverImage.hint}
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
                   <div className="absolute bottom-0 left-0 p-6 md:p-8">
