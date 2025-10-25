@@ -49,9 +49,9 @@ export default function RegisterPage() {
     if (result.success) {
       toast({
         title: 'Registration Successful',
-        description: 'Please check your email to verify your account.',
+        description: 'An OTP has been sent to your email. Please verify.',
       });
-      router.push('/login');
+      router.push('/verify-otp');
     } else {
       setError(result.error || 'An error occurred.');
       toast({
