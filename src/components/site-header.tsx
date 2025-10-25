@@ -8,6 +8,7 @@ const navLinks = [
   { href: '/', label: 'Work' },
   { href: '/about', label: 'About' },
   { href: '/contact', label: 'Contact' },
+  { href: '/dashboard', label: 'Dashboard' },
 ];
 
 const secondaryLinks = [
