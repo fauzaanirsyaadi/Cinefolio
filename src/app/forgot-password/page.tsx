@@ -9,17 +9,15 @@ import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { LogIn } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { login } from '@/app/login/actions';
 import Link from 'next/link';
+import { requestPasswordReset } from './actions';
 
 const formSchema = z.object({
   email: z.string().email({ message: 'Please enter a valid email.' }),
-  password: z.string().min(1, { message: 'Password is required.' }),
 });
 
-export default function LoginPage() {
+export default function ForgotPasswordPage() {
   const { toast } = useToast();
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
@@ -28,34 +26,23 @@ export default function LoginPage() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       email: '',
-      password: '',
     },
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setError(null);
-    try {
-      const result = await login(values);
-      if (result.success) {
-        toast({
-          title: 'Login Successful',
-          description: "You're now logged in.",
-        });
-        router.push('/dashboard');
-        router.refresh();
-      } else {
-        setError(result.error || 'Invalid credentials.');
-        toast({
-            title: 'Login Failed',
-            description: result.error || 'Invalid credentials.',
-            variant: 'destructive',
-          });
-      }
-    } catch (e) {
-      setError('An unexpected error occurred.');
+    const result = await requestPasswordReset(values);
+    if (result.success) {
       toast({
-        title: 'Error',
-        description: 'An unexpected error occurred.',
+        title: 'Password Reset Requested',
+        description: 'If an account exists, a reset link has been sent to your email.',
+      });
+      router.push('/login');
+    } else {
+      setError(result.error || 'An error occurred.');
+      toast({
+        title: 'Request Failed',
+        description: result.error || 'An unknown error occurred.',
         variant: 'destructive',
       });
     }
@@ -66,9 +53,9 @@ export default function LoginPage() {
       <div className="max-w-md mx-auto">
         <Card>
           <CardHeader className="text-center">
-            <CardTitle className="text-2xl font-bold tracking-tight font-headline">Dashboard Access</CardTitle>
+            <CardTitle className="text-2xl font-bold tracking-tight font-headline">Forgot Password</CardTitle>
             <CardDescription>
-              Enter your credentials to access the dashboard.
+              Enter your email to receive a password reset link.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -81,20 +68,7 @@ export default function LoginPage() {
                     <FormItem>
                       <FormLabel>Email</FormLabel>
                       <FormControl>
-                        <Input type="email" placeholder="admin@example.com" {...field} className="bg-background text-base" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="password"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Password</FormLabel>
-                      <FormControl>
-                        <Input type="password" placeholder="password" {...field} className="bg-background text-base" />
+                        <Input type="email" placeholder="your@email.com" {...field} className="bg-background text-base" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -102,19 +76,14 @@ export default function LoginPage() {
                 />
                 {error && <p className="text-sm font-medium text-destructive">{error}</p>}
                 <Button type="submit" size="lg" className="w-full" disabled={form.formState.isSubmitting}>
-                  {form.formState.isSubmitting ? 'Logging in...' : <>Log In <LogIn className="ml-2 h-4 w-4" /></>}
+                  {form.formState.isSubmitting ? 'Sending...' : 'Send Reset Link'}
                 </Button>
               </form>
             </Form>
             <div className="mt-4 text-center text-sm">
-              <Link href="/forgot-password" passHref>
-                <span className="underline cursor-pointer">Forgot your password?</span>
-              </Link>
-            </div>
-            <div className="mt-4 text-center text-sm">
-              Don't have an account?{' '}
-              <Link href="/register" passHref>
-                <span className="underline cursor-pointer">Sign up</span>
+              Remember your password?{' '}
+              <Link href="/login" passHref>
+                <span className="underline cursor-pointer">Log in</span>
               </Link>
             </div>
           </CardContent>
