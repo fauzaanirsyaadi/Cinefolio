@@ -14,9 +14,9 @@ const navLinks = [
 ];
 
 const secondaryLinks = [
-    { href: '#', label: 'Cookie' },
-    { href: '#', label: 'Terms' },
-    { href: '#', label: 'Privacy' },
+    { href: '/cookies', label: 'Cookie' },
+    { href: '/terms', label: 'Terms' },
+    { href: '/privacy', label: 'Privacy' },
 ]
 
 const SiteHeader = async () => {
