@@ -32,6 +32,10 @@ export default function EditProjectPage() {
       });
       router.push('/dashboard');
     } else if (data) {
+      // ensure we have an array of length 5 for the form and no nulls
+      const gallery = Array.isArray(data.galleryImages) ? data.galleryImages.slice(0, 5) : [];
+      while (gallery.length < 5) gallery.push('');
+
       setProject({
         title: data.title,
         slug: data.slug,
@@ -39,7 +43,9 @@ export default function EditProjectPage() {
         shortDescription: data.shortDescription,
         description: data.description,
         coverImageUrl: data.coverImage,
-        galleryImageUrls: (data.galleryImages || []).join('\n'),
+        galleryImageUrls: gallery as [string, string, string, string, string],
+        // normalize trailer field to empty string if null/undefined
+        trailerUrl: (data.trailerUrl ?? data.trailer_url ?? '') as string,
       });
     }
   }
@@ -54,7 +60,9 @@ export default function EditProjectPage() {
         shortDescription: data.shortDescription,
         description: data.description,
         coverImage: data.coverImageUrl,
-        galleryImages: data.galleryImageUrls.split('\n').filter(url => url),
+        // use DB column name (snake_case) so PostgREST / Supabase schema matches
+        trailer_url: data.trailerUrl || null,
+        galleryImages: (data.galleryImageUrls || []).filter(url => url),
       })
       .eq('id', id);
 

@@ -16,7 +16,9 @@ const formSchema = z.object({
   shortDescription: z.string().min(10, 'Short description is required.'),
   description: z.string().min(20, 'Full description is required.'),
   coverImageUrl: z.string().url('Must be a valid URL.'),
-  galleryImageUrls: z.string().optional(),
+  trailerUrl: z.string().url('Must be a valid URL.').optional(),
+  // Expect exactly 5 inputs (can be empty strings). Validate as array of strings.
+  galleryImageUrls: z.array(z.string()).length(5),
 });
 
 interface ProjectFormProps {
@@ -25,16 +27,32 @@ interface ProjectFormProps {
 }
 
 export function ProjectForm({ onSubmit, initialData }: ProjectFormProps) {
+  // Normalize initial data to ensure no `null` values are passed to inputs.
+  const normalizedInitial: Partial<ProjectFormData> | undefined = initialData
+    ? {
+        ...initialData,
+        trailerUrl: (initialData.trailerUrl ?? '') as string,
+        galleryImageUrls: (
+          (initialData.galleryImageUrls as string[] | undefined) || []
+        )
+          .slice(0, 5)
+          .concat(Array(5).fill(''))
+          .slice(0, 5) as [string, string, string, string, string],
+      }
+    : undefined;
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: initialData || {
+    defaultValues: normalizedInitial || {
       title: '',
       slug: '',
       category: '',
       shortDescription: '',
       description: '',
       coverImageUrl: '',
-      galleryImageUrls: '',
+      trailerUrl: '',
+      // provide 5 empty fields by default
+      galleryImageUrls: ['', '', '', '', ''],
     },
   });
   
@@ -128,17 +146,43 @@ export function ProjectForm({ onSubmit, initialData }: ProjectFormProps) {
         />
         <FormField
           control={form.control}
-          name="galleryImageUrls"
+          name="trailerUrl"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Gallery Image URLs</FormLabel>
+              <FormLabel>Trailer URL</FormLabel>
               <FormControl>
-                <Textarea placeholder="Enter one image URL per line." rows={5} {...field} />
+                <Input type="url" placeholder="https://www.youtube.com/watch?v=..." {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
+        <div>
+          <FormLabel className="mb-2 block">Gallery Image URLs (up to 5)</FormLabel>
+          <div className="grid grid-cols-1 sm:grid-cols-5 gap-3">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <FormField
+                key={i}
+                control={form.control}
+                name={`galleryImageUrls.${i}`}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <Input
+                        type="url"
+                        placeholder={`Image URL ${i + 1}`}
+                        {...field}
+                        className="bg-background text-sm"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            ))}
+          </div>
+          <p className="mt-2 text-xs text-muted-foreground">Fill any of the 5 slots. Leave empty for unused slots.</p>
+        </div>
         <Button type="submit" disabled={form.formState.isSubmitting}>
           {form.formState.isSubmitting ? 'Saving...' : 'Save Project'}
         </Button>

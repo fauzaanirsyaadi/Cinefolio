@@ -9,6 +9,7 @@ export interface Project {
   description: string;
   coverImage: ImageDetails | string;
   galleryImages: (ImageDetails | string)[];
+  trailerUrl?: string | null;
 }
 
 export type ProjectFormData = {
@@ -18,5 +19,6 @@ export type ProjectFormData = {
   shortDescription: string;
   description: string;
   coverImageUrl: string;
-  galleryImageUrls: string; // Will be a newline-separated string in the form
+  galleryImageUrls: [string, string, string, string, string]; // Fixed-length array for the project form (5 inputs). Empty string = unused.
+  trailerUrl?: string;
 };

@@ -83,3 +83,19 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Added global rules */
+html,
+body {
+  height: 100%;
+}
+
+body {
+  background: #000;
+  color: #fff;
+}
+
+/* Ensure headline font fallback */
+.font-headline {
+  font-family: var(--font-display, ui-sans-serif), system-ui, -apple-system;
+}

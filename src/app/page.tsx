@@ -1,117 +1,108 @@
-import { createClient } from '@/lib/supabase/server';
-import type { Project } from '@/lib/types';
-import Image from 'next/image';
-import Link from 'next/link';
-import { Card, CardContent } from '@/components/ui/card';
-import { Carousel, CarouselItem, CarouselPrevious, CarouselNext } from '@/components/ui/carousel';
+import { HomeRoll } from '@/components/home-roll'
+import { createClient } from '@/lib/supabase/server'
 
-export const revalidate = 0; // Revalidate data on every request
+// Pastikan halaman tidak di-prerender statis
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
 
-export default async function Home() {
-  // Server-side Supabase client (await the async helper)
-  const supabase = await createClient();
+export default async function HomePage() {
+    const supabase = await createClient()
 
-  const { data, error } = await supabase
-    .from('projects')
-    .select('*')
-    .order('id', { ascending: true });
+    // Fallback dummy — agar UI tetap tampil jika DB kosong/gagal
+    const fallbackProjects = [
+        {
+            slug: 'midnight-echo',
+            title: 'Midnight Echo',
+            category: 'Feature Film',
+            shortDescription: 'Thriller psikologis berlatar malam kota.',
+            coverImage:
+                'https://images.unsplash.com/photo-1495567720989-cebdbdd97913?q=80&w=1920&auto=format&fit=crop',
+        },
+        {
+            slug: 'salt-and-smoke',
+            title: 'Salt & Smoke',
+            category: 'Documentary',
+            shortDescription: 'Komunitas nelayan pesisir dan perubahan iklim.',
+            coverImage:
+                'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=1920&auto=format&fit=crop',
+        },
+        {
+            slug: 'paper-stars',
+            title: 'Paper Stars',
+            category: 'Short Film',
+            shortDescription: 'Coming-of-age bernuansa retro.',
+            coverImage:
+                'https://images.unsplash.com/photo-1499084732479-de2c02d45fc4?q=80&w=1920&auto=format&fit=crop',
+        },
+        {
+            slug: 'neon-boulevard',
+            title: 'Neon Boulevard',
+            category: 'Music Video',
+            shortDescription: 'Cyberpunk neon choreography.',
+            coverImage:
+                'https://images.unsplash.com/photo-1496307042754-b4aa456c4a2d?q=80&w=1920&auto=format&fit=crop',
+        },
+        {
+            slug: 'the-last-frame',
+            title: 'The Last Frame',
+            category: 'Commercial',
+            shortDescription: 'Iklan sinematik kamera analog.',
+            coverImage:
+                'https://images.unsplash.com/photo-1519183071298-a2962be96f83?q=80&w=1920&auto=format&fit=crop',
+        },
+        {
+            slug: 'outsider-freud',
+            title: 'Outsider Freud',
+            category: 'Documentary',
+            shortDescription: '—',
+            coverImage:
+                'https://images.unsplash.com/photo-1501594907352-04cda38ebc29?q=80&w=1920&auto=format&fit=crop',
+        },
+    ] as const
 
-  if (error) {
-    console.error('Error fetching projects:', error);
-    return (
-      <main className="container mx-auto px-4 py-24">
-        <p className="text-destructive">Failed to load projects.</p>
-      </main>
-    );
-  }
+    try {
+        // Catatan: jika kolom 'created_at' tidak ada, ORDER BY ini bisa gagal.
+        // Anda bisa ganti ke 'id' jika tabel punya kolom itu.
+        const { data, error } = await (supabase
+            .from('projects')
+            .select('slug, title, category, shortDescription, coverImage')
+            .order('created_at', { ascending: false })
+            .limit(12))
 
-  const projectsToDisplay = (data || []).map((p: any, idx: number) => {
-    const coverUrl =
-      typeof p.coverImage === 'string' ? p.coverImage : (p.coverImage && (p.coverImage.url || (p.coverImage as any).imageUrl)) || '';
-    return {
-      idx,
-      id: p.id,
-      slug: p.slug,
-      title: p.title,
-      category: p.category,
-      shortDescription: p.shortDescription,
-      description: p.description,
-      coverImage: coverUrl,
-      galleryImages: p.galleryImages || [],
-      createdAt: p.created_at,
-    };
-  }) as Array<{
-    idx: number;
-    id: number;
-    slug: string;
-    title: string;
-    category: string;
-    shortDescription: string;
-    description: string;
-    coverImage: string;
-    galleryImages: string[];
-    createdAt: string | null;
-  }>;
+        // Logging untuk debugging server-side
+        console.log('[Home] Supabase select projects → error:', error)
+        console.log('[Home] Supabase select projects → count:', Array.isArray(data) ? data.length : null)
 
-  if (projectsToDisplay.length === 0) {
-    return (
-      <main className="container mx-auto px-4 py-24">
-        <p className="text-muted-foreground">No projects found.</p>
-      </main>
-    );
-  }
+        // Jika ORDER BY gagal (mis. kolom tidak ada), coba ulang tanpa ORDER
+        if (error && /created_at/i.test(error.message || '')) {
+            const retry = await supabase
+                .from('projects')
+                .select('slug, title, category, shortDescription, coverImage')
+                .limit(12)
 
-  return (
-    <main className="container mx-auto px-4 py-24">
-      <section className="animate-fade-in-up">
-        <div className="flex items-center justify-between mb-8">
-          <h1 className="text-3xl font-bold tracking-tight font-headline">Work</h1>
-          <Link href="/dashboard" className="text-sm text-primary underline">
-            Manage
-          </Link>
-        </div>
+            console.log('[Home] Retry without ORDER → error:', retry.error)
+            console.log('[Home] Retry without ORDER → count:', Array.isArray(retry.data) ? retry.data.length : null)
 
-        <div className="relative">
-          <Carousel className="min-h-[320px]">
-            {projectsToDisplay.map((p) => (
-              <CarouselItem key={p.id} className="p-4">
-                <Card className="max-w-3xl mx-auto">
-                  <div className="relative w-full aspect-[16/9] rounded-t-md overflow-hidden bg-muted">
-                    {p.coverImage ? (
-                      <Image
-                        src={p.coverImage}
-                        alt={p.title}
-                        fill
-                        className="object-cover"
-                        sizes="(max-width: 768px) 100vw, 800px"
-                      />
-                    ) : null}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                    <div className="absolute left-6 bottom-6 text-white">
-                      <span className="inline-block bg-black/50 px-2 py-1 rounded text-xs uppercase tracking-wider">{p.category}</span>
-                      <h2 className="mt-2 text-2xl font-extrabold">{p.title}</h2>
-                    </div>
-                  </div>
+            const items = (retry.data && retry.data.length ? retry.data : fallbackProjects) as any
+            return (
+                <main className="relative">
+                    <HomeRoll items={items} />
+                </main>
+            )
+        }
 
-                  <CardContent className="p-6">
-                    <p className="text-muted-foreground mb-4 line-clamp-3">{p.shortDescription}</p>
-                    <div className="flex items-center justify-between">
-                      <Link href={`/projects/${p.slug}`} className="text-sm text-primary underline">
-                        View Project
-                      </Link>
-                      <span className="text-xs text-muted-foreground">{p.createdAt ? new Date(p.createdAt).toLocaleDateString() : ''}</span>
-                    </div>
-                  </CardContent>
-                </Card>
-              </CarouselItem>
-            ))}
-
-            {/* Previous / Next must be rendered inside the Carousel so useCarousel() has context */}
-            <CarouselPrevious className="absolute left-2 top-1/2 -translate-y-1/2 z-10" />
-            <CarouselNext className="absolute right-2 top-1/2 -translate-y-1/2 z-10" />
-          </Carousel>
-        </div>
-      </section>
-    </main>
-  );
+        const items = (data && data.length ? data : fallbackProjects) as any
+        return (
+            <main className="relative">
+                <HomeRoll items={items} />
+            </main>
+        )
+    } catch (e: any) {
+        console.error('[Home] Unexpected error fetching projects:', e)
+        return (
+            <main className="relative">
+                <HomeRoll items={fallbackProjects as any} />
+            </main>
+        )
+    }
 }

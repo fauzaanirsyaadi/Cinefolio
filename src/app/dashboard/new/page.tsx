@@ -12,6 +12,7 @@ export default function NewProjectPage() {
   const supabase = createClient();
 
   const handleSubmit = async (data: ProjectFormData) => {
+    const gallery = (data.galleryImageUrls || []).filter((u) => !!u);
     const { error } = await supabase.from('projects').insert([
       {
         slug: data.slug,
@@ -20,7 +21,8 @@ export default function NewProjectPage() {
         shortDescription: data.shortDescription,
         description: data.description,
         coverImage: data.coverImageUrl,
-        galleryImages: data.galleryImageUrls.split('\n').filter(url => url),
+        trailer_url: data.trailerUrl || null,
+        galleryImages: gallery,
       },
     ]);
 

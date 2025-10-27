@@ -10,6 +10,13 @@ const nextConfig: NextConfig = {
   },
   images: {
     remotePatterns: [
+      // ... existing
+      {
+        protocol: 'https',
+        hostname: 'cinefolio-sable.vercel.app',
+        port: '',
+        pathname: '/**',
+      },
       {
         protocol: 'https',
         hostname: 'placehold.co',

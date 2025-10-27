@@ -8,10 +8,14 @@ CREATE TABLE projects (
   description TEXT,
   "coverImage" TEXT,
   "galleryImages" TEXT[],
-  "createdAt" TIMESTAMPTZ DEFAULT NOW()
+  "createdAt" TIMESTAMPTZ DEFAULT NOW(),
+  trailer_url TEXT
 );
 
 -- Enable Row Level Security (RLS)
+ALTER TABLE public.projects
+ADD COLUMN IF NOT EXISTS trailer_url TEXT;
+
 ALTER TABLE projects ENABLE ROW LEVEL SECURITY;
 
 -- Create policies for public access
